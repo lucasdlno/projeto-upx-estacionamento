@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protótipo Interativo - Vagas Inteligentes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .parking-lot {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            padding: 20px;
+            background-color: #d1d1d1;
+            border-radius: 10px;
+            border: 2px solid #555;
+            min-height: 100px;
+        }
+
+        .parking-space {
+            width: 100px;
+            height: 150px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.3s;
+        }
+
+        .parking-space:hover {
+            transform: scale(1.05);
+        }
+
+        .parking-space.available {
+            background-color: #28a745; /* Verde */
+        }
+
+        .parking-space.occupied {
+            background-color: #dc3545; /* Vermelho */
+        }
+
+        /* Estilos do Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 450px;
+            text-align: left;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: #0056b3;
+        }
+        
+        /* Estilos para o formulário e botões */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background-color: #007bff;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Estacionamento - Prédio A</h1>
+    <div class="parking-lot" id="parkingLot">
+        </div>
+
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 id="modalTitle">Título do Modal</h2>
+            <div id="modalBody">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        const parkingLotContainer = document.getElementById('parkingLot');
+        const modal = document.getElementById('infoModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const closeButton = document.querySelector('.close-button');
+        
+        // --- DADOS DE EXEMPLO (Simulando o Banco de Dados) ---
+        let vagasData = [
+            { id: 'A01', status: 'occupied', carro: { modelo: 'Fiat Argo', placa: 'ABC-1234' }, pessoa: { nome: 'João Silva', ra: 'N12345' }, datachegada: '25/08/2025 19:40' },
+            { id: 'A02', status: 'available' },
+            { id: 'A03', status: 'available' },
+            { id: 'A04', status: 'occupied', carro: { modelo: 'Honda Civic', placa: 'XYZ-9876' }, pessoa: { nome: 'Maria Oliveira', ra: 'N67890' }, datachegada: '25/08/2025 20:15' },
+            { id: 'A05', status: 'available' },
+            { id: 'B01', status: 'available' },
+            { id: 'B02', status: 'occupied', carro: { modelo: 'VW Nivus', placa: 'QWE-4567' }, pessoa: { nome: 'Carlos Pereira', ra: 'N54321' }, datachegada: '25/08/2025 18:30' },
+            { id: 'B03', status: 'available' },
+            { id: 'B04', status: 'available' },
+            { id: 'B05', status: 'available' },
+        ];
+
+        let currentVagaId = null; // Guarda o ID da vaga que foi clicada
+
+        // --- FUNÇÃO PARA DESENHAR/ATUALIZAR AS VAGAS NA TELA ---
+        function renderVagas() {
+            parkingLotContainer.innerHTML = ''; // Limpa o estacionamento antes de redesenhar
+            vagasData.forEach(vaga => {
+                const vagaElement = document.createElement('div');
+                vagaElement.classList.add('parking-space', vaga.status);
+                vagaElement.innerText = vaga.id;
+                vagaElement.dataset.vagaId = vaga.id; // Guarda o ID no próprio elemento
+
+                vagaElement.addEventListener('click', () => {
+                    currentVagaId = vaga.id;
+                    if (vaga.status === 'occupied') {
+                        showDetailsModal(vaga);
+                    } else {
+                        showEntryFormModal(vaga);
+                    }
+                });
+
+                parkingLotContainer.appendChild(vagaElement);
+            });
+        }
+
+        // --- FUNÇÕES PARA CONTROLAR O MODAL ---
+        function showDetailsModal(vaga) {
+            modalTitle.innerText = `Detalhes da Vaga ${vaga.id}`;
+            modalBody.innerHTML = `
+                <p><strong>Status:</strong> Ocupada</p>
+                <p><strong>Data de Chegada:</strong> ${vaga.datachegada}</p>
+                <hr>
+                <p><strong>Condutor:</strong> ${vaga.pessoa.nome}</p>
+                <p><strong>RA:</strong> ${vaga.pessoa.ra}</p>
+                <p><strong>Veículo:</strong> ${vaga.carro.modelo}</p>
+                <p><strong>Placa:</strong> ${vaga.carro.placa}</p>
+                <div class="modal-buttons">
+                    <button class="btn btn-danger" onclick="registrarSaida()">Registrar Saída</button>
+                </div>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function showEntryFormModal(vaga) {
+            modalTitle.innerText = `Registrar Entrada na Vaga ${vaga.id}`;
+            modalBody.innerHTML = `
+                <form id="entryForm">
+                    <div class="form-group">
+                        <label for="nome">Nome do Condutor:</label>
+                        <input type="text" id="nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ra">RA:</label>
+                        <input type="text" id="ra" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelo">Modelo do Veículo:</label>
+                        <input type="text" id="modelo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="placa">Placa:</label>
+                        <input type="text" id="placa" required>
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="submit" class="btn btn-primary">Ocupar Vaga</button>
+                    </div>
+                </form>
+            `;
+            modal.style.display = 'flex';
+
+            // Adiciona o evento de submit ao formulário
+            document.getElementById('entryForm').addEventListener('submit', (event) => {
+                event.preventDefault(); // Impede que a página recarregue
+                registrarEntrada();
+            });
+        }
+
+        // --- FUNÇÕES DE AÇÃO ---
+        function registrarEntrada() {
+            const vaga = vagasData.find(v => v.id === currentVagaId);
+            if (vaga) {
+                // Pega os valores do formulário
+                vaga.status = 'occupied';
+                vaga.pessoa = {
+                    nome: document.getElementById('nome').value,
+                    ra: document.getElementById('ra').value
+                };
+                vaga.carro = {
+                    modelo: document.getElementById('modelo').value,
+                    placa: document.getElementById('placa').value
+                };
+                vaga.datachegada = new Date().toLocaleString('pt-BR'); // Pega data e hora atuais
+
+                closeModal();
+                renderVagas(); // Redesenha o estacionamento com a vaga atualizada
+            }
+        }
+
+        function registrarSaida() {
+            const vaga = vagasData.find(v => v.id === currentVagaId);
+            if (vaga) {
+                vaga.status = 'available';
+                delete vaga.pessoa; // Remove os dados da pessoa e carro
+                delete vaga.carro;
+                delete vaga.datachegada;
+                
+                closeModal();
+                renderVagas(); // Redesenha o estacionamento
+            }
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        // Eventos para fechar o modal
+        closeButton.addEventListener('click', closeModal);
+        window.addEventListener('click', (event) => {
+            if (event.target == modal) {
+                closeModal();
+            }
+        });
+
+        // --- INICIALIZAÇÃO ---
+        renderVagas(); // Chama a função para desenhar o estado inicial do estacionamento
+
+    </script>
+</body>
+</html>
