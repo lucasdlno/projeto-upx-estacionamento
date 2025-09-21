@@ -1,0 +1,114 @@
+:root {
+  --green: #28a745;
+  --red: #dc3545;
+  --blue: #007bff;
+  --gray: #d1d1d1;
+  --dark: #333;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f2f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  color: var(--dark);
+}
+
+h1 {
+  color: var(--dark);
+}
+
+.parking-lot {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 15px;
+  padding: 20px;
+  background-color: var(--gray);
+  border-radius: 10px;
+  border: 2px solid #555;
+  width: 100%;
+  max-width: 600px;
+}
+
+.parking-space {
+  height: 150px;
+  border: 2px solid var(--dark);
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.3s;
+}
+
+.parking-space:hover {
+  transform: scale(1.05);
+}
+
+.parking-space.available { background-color: var(--green); }
+.parking-space.occupied { background-color: var(--red); }
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal.active { display: flex; }
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 450px;
+  text-align: left;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.close-button {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.form-group { margin-bottom: 15px; }
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-primary { background-color: var(--blue); }
+.btn-danger { background-color: var(--red); }
