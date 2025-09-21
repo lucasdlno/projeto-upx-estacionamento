@@ -1,163 +1,104 @@
-const parkingLotContainer = document.getElementById('parkingLot');
-const modal = document.getElementById('infoModal');
-const modalTitle = document.getElementById('modalTitle');
-const modalBody = document.getElementById('modalBody');
-const closeButton = document.querySelector('.close-button');
+document.addEventListener("DOMContentLoaded", () => {
+  const vagas = ["A01","A02","A03","A04","A05","B01","B02","B03","B04","B05"];
+  const parkingLot = document.getElementById("parking-lot");
+  const form = document.getElementById("formEntrada");
 
-let currentVagaId = null;
+  // Variável para guardar os dados do formulário temporariamente
+  let dadosVeiculoPendente = null;
 
-// --- Dados simulando banco ---
-let vagasData = [
-  { id: 'A01', status: 'occupied', carro: { modelo: 'Fiat Argo', placa: 'ABC-1234' }, pessoa: { nome: 'João Silva', ra: 'N12345' }, datachegada: '25/08/2025 19:40' },
-  { id: 'A02', status: 'available' },
-  { id: 'A03', status: 'available' },
-  { id: 'A04', status: 'occupied', carro: { modelo: 'Honda Civic', placa: 'XYZ-9876' }, pessoa: { nome: 'Maria Oliveira', ra: 'N67890' }, datachegada: '25/08/2025 20:15' },
-  { id: 'A05', status: 'available' },
-  { id: 'B01', status: 'available' },
-  { id: 'B02', status: 'occupied', carro: { modelo: 'VW Nivus', placa: 'QWE-4567' }, pessoa: { nome: 'Carlos Pereira', ra: 'N54321' }, datachegada: '25/08/2025 18:30' },
-  { id: 'B03', status: 'available' },
-  { id: 'B04', status: 'available' },
-  { id: 'B05', status: 'available' },
-];
+  // Função para lidar com o clique em uma vaga
+  function handleVagaClick(event) {
+    const vagaElement = event.currentTarget;
 
-// --- Serviços de Vagas ---
-const VagasService = {
-  ocupar(id, pessoa, carro) {
-    const vaga = vagasData.find(v => v.id === id);
-    if (!vaga) return;
-    Object.assign(vaga, {
-      status: "occupied",
-      pessoa,
-      carro,
-      datachegada: formatDateTime(new Date())
-    });
-  },
-  liberar(id) {
-    const vaga = vagasData.find(v => v.id === id);
-    if (!vaga) return;
-    Object.assign(vaga, { status: "available" });
-    delete vaga.pessoa;
-    delete vaga.carro;
-    delete vaga.datachegada;
+    // Caso 1: A vaga está ocupada (clique para liberar)
+    if (vagaElement.classList.contains("ocupada")) {
+      const placa = vagaElement.dataset.placa;
+      const condutor = vagaElement.dataset.condutor;
+      
+      if (confirm(`Deseja liberar a vaga ${vagaElement.dataset.vagaId} (${placa} - ${condutor})?`)) {
+        // Limpa os dados e o estilo
+        vagaElement.classList.remove("ocupada");
+        vagaElement.classList.add("livre");
+        vagaElement.innerHTML = vagaElement.dataset.vagaId; // Restaura o nome original da vaga
+        vagaElement.title = ""; // Limpa a dica de tela
+        
+        // Remove os dados do dataset
+        delete vagaElement.dataset.condutor;
+        delete vagaElement.dataset.ra;
+        delete vagaElement.dataset.veiculo;
+        delete vagaElement.dataset.placa;
+      }
+    } 
+    // Caso 2: A vaga está livre e há dados pendentes (clique para ocupar)
+    else if (dadosVeiculoPendente) {
+      vagaElement.classList.remove("livre");
+      vagaElement.classList.add("ocupada");
+
+      // Armazena os dados do veículo no 'dataset' do elemento da vaga
+      vagaElement.dataset.condutor = dadosVeiculoPendente.condutor;
+      vagaElement.dataset.ra = dadosVeiculoPendente.ra;
+      vagaElement.dataset.veiculo = dadosVeiculoPendente.veiculo;
+      vagaElement.dataset.placa = dadosVeiculoPendente.placa;
+
+      // Exibe a placa na vaga
+      vagaElement.innerHTML = `${vagaElement.dataset.vagaId}<br><span style="font-size: 14px;">${dadosVeiculoPendente.placa}</span>`;
+      
+      // Adiciona mais detalhes na dica de tela (tooltip)
+      vagaElement.title = `Condutor: ${dadosVeiculoPendente.condutor}\nRA: ${dadosVeiculoPendente.ra}\nVeículo: ${dadosVeiculoPendente.veiculo}`;
+      
+      // Limpa os dados pendentes e reseta o formulário
+      dadosVeiculoPendente = null;
+      form.reset();
+    } 
+    // Caso 3: A vaga está livre, mas não há dados pendentes
+    else {
+      alert("⚠️ Por favor, preencha e envie o formulário de entrada primeiro!");
+    }
   }
-};
 
-// --- Util ---
-function formatDateTime(date) {
-  return new Intl.DateTimeFormat('pt-BR', {
-    dateStyle: "short",
-    timeStyle: "short"
-  }).format(date);
-}
-
-// --- Renderização ---
-function renderVagas() {
-  parkingLotContainer.innerHTML = '';
-  vagasData.forEach(vaga => {
-    const vagaElement = document.createElement('div');
-    vagaElement.classList.add('parking-space', vaga.status);
-    vagaElement.innerText = vaga.id;
-    vagaElement.dataset.vagaId = vaga.id;
-    parkingLotContainer.appendChild(vagaElement);
+  // Cria as vagas e adiciona o listener de clique
+  vagas.forEach(vagaId => {
+    const div = document.createElement("div");
+    div.classList.add("vaga", "livre");
+    div.innerText = vagaId;
+    div.dataset.vagaId = vagaId; // Armazena o ID original da vaga
+    div.addEventListener("click", handleVagaClick);
+    parkingLot.appendChild(div);
   });
-}
 
-// --- Modal ---
-function openModal(title, bodyHtml) {
-  modalTitle.innerText = title;
-  modalBody.innerHTML = bodyHtml;
-  modal.classList.add("active");
-}
+  // Validação do formulário
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
 
-function closeModal() {
-  modal.classList.remove("active");
-}
+    const condutor = document.getElementById("condutor").value.trim();
+    const ra = document.getElementById("ra").value.trim();
+    const veiculo = document.getElementById("veiculo").value.trim();
+    const placa = document.getElementById("placa").value.trim().toUpperCase();
 
-closeButton.addEventListener('click', closeModal);
-window.addEventListener('click', (e) => {
-  if (e.target === modal) closeModal();
+    const regexNome = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;       // só letras
+    const regexRA = /^\d{6}$/;                         // exatamente 6 números
+    const regexVeiculo = /^[A-Za-z0-9\s-]+$/;          // letras, números e hifens
+    const regexPlaca = /^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/; // Mercosul (AAA1B23 ou ABC1234)
+
+    if (!regexNome.test(condutor)) {
+      alert("❌ O nome do condutor deve conter apenas letras.");
+      return;
+    }
+    if (!regexRA.test(ra)) {
+      alert("❌ O RA deve conter exatamente 6 números.");
+      return;
+    }
+    if (!regexVeiculo.test(veiculo)) {
+      alert("❌ O modelo do veículo deve conter apenas letras e números.");
+      return;
+    }
+    if (!regexPlaca.test(placa)) {
+      alert("❌ A placa deve seguir o padrão Mercosul (ex: ABC1D23 ou ABC1234).");
+      return;
+    }
+
+    // Se passar na validação, armazena os dados e avisa o usuário
+    dadosVeiculoPendente = { condutor, ra, veiculo, placa };
+    alert("✅ Dados validados! Agora clique em uma vaga verde para estacionar.");
+  });
 });
-
-// --- Eventos ---
-parkingLotContainer.addEventListener('click', (e) => {
-  const vagaId = e.target.dataset.vagaId;
-  if (!vagaId) return;
-
-  currentVagaId = vagaId;
-  const vaga = vagasData.find(v => v.id === vagaId);
-
-  vaga.status === "occupied"
-    ? showDetailsModal(vaga)
-    : showEntryFormModal(vaga);
-});
-
-// --- Modal Templates ---
-function showDetailsModal(vaga) {
-  openModal(
-    `Detalhes da Vaga ${vaga.id}`,
-    `
-    <p><strong>Status:</strong> Ocupada</p>
-    <p><strong>Data de Chegada:</strong> ${vaga.datachegada}</p>
-    <hr>
-    <p><strong>Condutor:</strong> ${vaga.pessoa.nome}</p>
-    <p><strong>RA:</strong> ${vaga.pessoa.ra}</p>
-    <p><strong>Veículo:</strong> ${vaga.carro.modelo}</p>
-    <p><strong>Placa:</strong> ${vaga.carro.placa}</p>
-    <div class="modal-buttons">
-      <button class="btn btn-danger" id="btnSaida">Registrar Saída</button>
-    </div>
-    `
-  );
-
-  document.getElementById("btnSaida").addEventListener("click", () => {
-    VagasService.liberar(currentVagaId);
-    closeModal();
-    renderVagas();
-  });
-}
-
-function showEntryFormModal(vaga) {
-  openModal(
-    `Registrar Entrada na Vaga ${vaga.id}`,
-    `
-    <form id="entryForm">
-      <div class="form-group">
-        <label for="nome">Nome do Condutor:</label>
-        <input type="text" id="nome" required>
-      </div>
-      <div class="form-group">
-        <label for="ra">RA:</label>
-        <input type="text" id="ra" required>
-      </div>
-      <div class="form-group">
-        <label for="modelo">Modelo do Veículo:</label>
-        <input type="text" id="modelo" required>
-      </div>
-      <div class="form-group">
-        <label for="placa">Placa:</label>
-        <input type="text" id="placa" required>
-      </div>
-      <div class="modal-buttons">
-        <button type="submit" class="btn btn-primary">Ocupar Vaga</button>
-      </div>
-    </form>
-    `
-  );
-
-  document.getElementById('entryForm').addEventListener('submit', (event) => {
-    event.preventDefault();
-    VagasService.ocupar(currentVagaId, {
-      nome: document.getElementById('nome').value,
-      ra: document.getElementById('ra').value
-    }, {
-      modelo: document.getElementById('modelo').value,
-      placa: document.getElementById('placa').value
-    });
-
-    closeModal();
-    renderVagas();
-  });
-}
-
-// --- Inicialização ---
-renderVagas();
