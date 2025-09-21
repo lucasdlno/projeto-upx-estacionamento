@@ -1,114 +1,70 @@
-:root {
-  --green: #28a745;
-  --red: #dc3545;
-  --blue: #007bff;
-  --gray: #d1d1d1;
-  --dark: #333;
-}
-
 body {
   font-family: Arial, sans-serif;
-  background-color: #f0f2f5;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  background: #f5f5f5;
+}
+
+header {
+  background: #222;
+  color: #fff;
   padding: 20px;
-  color: var(--dark);
 }
 
 h1 {
-  color: var(--dark);
+  margin: 0;
 }
 
 .parking-lot {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  grid-template-columns: repeat(5, 100px);
   gap: 15px;
-  padding: 20px;
-  background-color: var(--gray);
-  border-radius: 10px;
-  border: 2px solid #555;
-  width: 100%;
-  max-width: 600px;
+  justify-content: center;
+  margin: 30px 0;
 }
 
-.parking-space {
+.vaga {
+  width: 100px;
   height: 150px;
-  border: 2px solid var(--dark);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 18px;
   border-radius: 8px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: bold;
   color: white;
   cursor: pointer;
-  transition: transform 0.2s, background-color 0.3s;
+  transition: 0.3s;
 }
 
-.parking-space:hover {
-  transform: scale(1.05);
+.livre {
+  background-color: green;
 }
 
-.parking-space.available { background-color: var(--green); }
-.parking-space.occupied { background-color: var(--red); }
-
-/* Modal */
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0,0,0,0.6);
-  justify-content: center;
-  align-items: center;
+.ocupada {
+  background-color: red;
 }
 
-.modal.active { display: flex; }
-
-.modal-content {
-  background-color: #fff;
+.form-section {
+  background: #fff;
   padding: 20px;
-  border-radius: 10px;
-  width: 90%;
-  max-width: 450px;
-  text-align: left;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  width: 300px;
+  margin: 0 auto 30px auto;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-.close-button {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  cursor: pointer;
-}
-
-.form-group { margin-bottom: 15px; }
-.form-group label {
+label {
   display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
+  margin-top: 10px;
+  text-align: left;
 }
-.form-group input {
+
+input {
   width: 100%;
-  padding: 8px;
+  padding: 5px;
+  margin-top: 5px;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 4px;
 }
-
-.modal-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.btn-primary { background-color: var(--blue); }
-.btn-danger { background-color: var(--red); }
