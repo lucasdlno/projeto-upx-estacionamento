@@ -12,17 +12,33 @@
   </header>
 
   <main>
-    <section class="parking-lot" id="parkingLot"></section>
-  </main>
+    <!-- Grid das vagas -->
+    <section class="parking-lot" id="parking-lot"></section>
 
-  <!-- Modal -->
-  <div id="infoModal" class="modal" role="dialog" aria-modal="true">
-    <div class="modal-content" tabindex="-1">
-      <span class="close-button" aria-label="Fechar">&times;</span>
-      <h2 id="modalTitle"></h2>
-      <div id="modalBody"></div>
-    </div>
-  </div>
+    <!-- Formulário de cadastro -->
+    <section class="form-section">
+      <h2>Registrar Entrada</h2>
+      <form id="formEntrada">
+        <label>Nome do Condutor:</label>
+        <input type="text" id="condutor" required>
+        <br>
+
+        <label>RA:</label>
+        <input type="text" id="ra" required>
+        <br>
+
+        <label>Modelo do Veículo:</label>
+        <input type="text" id="veiculo" required>
+        <br>
+
+        <label>Placa:</label>
+        <input type="text" id="placa" required>
+        <br>
+
+        <button type="submit">Ocupar Vaga</button>
+      </form>
+    </section>
+  </main>
 
   <script src="script.js"></script>
 </body>
