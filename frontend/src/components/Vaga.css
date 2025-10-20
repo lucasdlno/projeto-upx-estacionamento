@@ -1,0 +1,33 @@
+.vaga {
+    width: 120px;
+    height: 60px;
+    border: 2px solid #333;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    transition: transform 0.2s;
+}
+
+.vaga-livre {
+    background-color: #2ecc71; /* Verde */
+    cursor: pointer;
+}
+
+.vaga-livre:hover {
+    transform: scale(1.05);
+}
+
+.vaga-ocupada {
+    background-color: #e74c3c; /* Vermelho */
+    cursor: not-allowed;
+}
+
+.vaga-minha {
+    background-color: #3498db; /* Azul */
+    cursor: not-allowed;
+}
