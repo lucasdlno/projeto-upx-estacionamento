@@ -1,5 +1,5 @@
 import React from 'react';
-import './Vaga.css'; // Vamos criar um CSS específico para a vaga
+import './Vaga.css'; // O caminho para o CSS está correto
 
 function Vaga({ numero, estaOcupada, ocupadaPorMim, onClick }) {
     
@@ -15,12 +15,8 @@ function Vaga({ numero, estaOcupada, ocupadaPorMim, onClick }) {
         }
     }
 
-    // Na tela de admin, o Vaga.css vai sobrescrever o cursor
-    // (Melhoria: podemos passar uma prop 'isAdmin' no futuro)
-
     return (
         <div 
-            // Adiciona a classe 'clicavel' se a vaga puder ser clicada
             className={`vaga ${statusClasse} ${eClicavel ? 'clicavel' : ''}`} 
             onClick={eClicavel ? onClick : null}
         >
@@ -29,4 +25,4 @@ function Vaga({ numero, estaOcupada, ocupadaPorMim, onClick }) {
     );
 }
 export default Vaga;
-// A linha 'fetch' e 'import' extras foram removidas daqui
+// A linha 'fetch' e 'import' extras foram removidas.

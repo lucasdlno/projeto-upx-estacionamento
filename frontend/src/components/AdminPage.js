@@ -1,4 +1,4 @@
-import apiUrl from '../lib/api'; // ✅ CORRIGIDO
+import apiUrl from '../lib/api'; // ✅ CAMINHO CORRIGIDO
 import React, { useState, useEffect } from 'react';
 import Vaga from './Vaga';
 
@@ -6,7 +6,7 @@ function AdminPage() {
     const [vagas, setVagas] = useState([]);
     const [vagaSelecionada, setVagaSelecionada] = useState(null);
     const [detalhesUsuario, setDetalhesUsuario] = useState(null);
-    const [loadingDetalhes, setLoadingDetalhes] = useState(false); // ✅ Adicionado
+    const [loadingDetalhes, setLoadingDetalhes] = useState(false);
 
     const buscarVagas = () => {
         // ✅ CORRIGIDO: usa a variável apiUrl
@@ -17,15 +17,15 @@ function AdminPage() {
 
     useEffect(() => {
         buscarVagas();
-        const interval = setInterval(buscarVagas, 5000); // Admin vê em tempo real
+        const interval = setInterval(buscarVagas, 5000); 
         return () => clearInterval(interval);
     }, []);
 
     const handleVagaClick = (vaga) => {
         if (vaga.ocupada) {
             setVagaSelecionada(vaga);
-            setLoadingDetalhes(true); // ✅ Adicionado
-            setDetalhesUsuario(null); // ✅ Limpa detalhes antigos
+            setLoadingDetalhes(true);
+            setDetalhesUsuario(null);
             
             // ✅ CORRIGIDO: usa a variável apiUrl
             fetch(`${apiUrl}/api/auth/carro/${vaga.ocupadaPorRA}`)
@@ -35,12 +35,11 @@ function AdminPage() {
                 })
                 .then(data => {
                     setDetalhesUsuario(data);
-                    setLoadingDetalhes(false); // ✅ Adicionado
+                    setLoadingDetalhes(false);
                 })
                 .catch(err => {
-                    // Se o RA for "IA-DETECTOU", o fetch vai falhar, e isso é esperado
                     setDetalhesUsuario({ nome: "Detectado pela IA", ra: vaga.ocupadaPorRA });
-                    setLoadingDetalhes(false); // ✅ Adicionado
+                    setLoadingDetalhes(false);
                 });
         } else {
             setVagaSelecionada(null);
@@ -57,7 +56,7 @@ function AdminPage() {
                         key={vaga.id}
                         numero={vaga.numero_vaga}
                         estaOcupada={vaga.ocupada}
-                        ocupadaPorMim={false} // Admin nunca "ocupa"
+                        ocupadaPorMim={false}
                         onClick={() => handleVagaClick(vaga)}
                     />
                 ))}
@@ -67,7 +66,7 @@ function AdminPage() {
                 <div className="detalhes-vaga">
                     <h3>Detalhes da Vaga {vagaSelecionada.numero_vaga}</h3>
                     <p><strong>Status:</strong> Ocupada</p>
-                    {loadingDetalhes ? ( // ✅ Adicionado
+                    {loadingDetalhes ? (
                         <p>Carregando detalhes do usuário...</p>
                     ) : detalhesUsuario ? (
                         <>
@@ -85,4 +84,4 @@ function AdminPage() {
     );
 }
 export default AdminPage;
-// A linha 'fetch' extra foi removida daqui
+// A linha 'fetch' extra no final foi removida.

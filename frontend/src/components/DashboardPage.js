@@ -1,11 +1,11 @@
-import apiUrl from '../lib/api'; // ✅ CORRIGIDO
+import apiUrl from '../lib/api'; // ✅ CAMINHO CORRIGIDO
 import React, { useState, useEffect } from 'react';
 import Vaga from './Vaga';
-import { useAuth } from '../App'; // Importa o hook de autenticação
+import { useAuth } from '../App';
 
 function DashboardPage() {
     const [vagas, setVagas] = useState([]);
-    const { usuarioLogado } = useAuth(); // Pega o usuário que está logado
+    const { usuarioLogado } = useAuth();
     const MEU_RA = usuarioLogado ? usuarioLogado.ra : null;
 
     const buscarVagas = () => {
@@ -18,13 +18,12 @@ function DashboardPage() {
 
     useEffect(() => {
         buscarVagas();
-        // Opcional: Atualiza o mapa a cada 10 segundos
         const interval = setInterval(buscarVagas, 10000);
-        return () => clearInterval(interval); // Limpa o intervalo ao sair
+        return () => clearInterval(interval);
     }, []);
 
     const handleVagaClick = (vagaClicada) => {
-        if (!MEU_RA) return; // Não faz nada se não estiver logado
+        if (!MEU_RA) return;
 
         let url = '';
         let acao = '';
@@ -38,7 +37,7 @@ function DashboardPage() {
             url = `${apiUrl}/api/vagas/${vagaClicada.id}/ocupar`;
             acao = 'Ocupando';
         } else {
-            return; // Vaga de outro usuário, não faz nada
+            return;
         }
 
         console.log(`Frontend: ${acao} vaga ID: ${vagaClicada.id}`);
@@ -76,4 +75,4 @@ function DashboardPage() {
     );
 }
 export default DashboardPage;
-// A linha 'fetch' extra foi removida daqui
+// A linha 'fetch' extra no final foi removida.

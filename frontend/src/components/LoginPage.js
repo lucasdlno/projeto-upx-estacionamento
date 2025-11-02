@@ -1,4 +1,4 @@
-import apiUrl from '../lib/api'; // ✅ CORRIGIDO
+import apiUrl from '../lib/api'; // ✅ CAMINHO CORRIGIDO
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,21 +12,19 @@ function LoginPage({ onLoginSuccess }) {
         e.preventDefault();
         setError('');
         try {
-            // ✅ CORRIGIDO: usa a variável apiUrl
-            const res = await fetch(`${apiUrl}/api/auth/login`, {
+            const res = await fetch(`${apiUrl}/api/auth/login`, { // Usa a variável
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ra, senha }),
             });
 
             if (!res.ok) {
-                const data = await res.json(); // Pega a mensagem de erro do backend
+                const data = await res.json();
                 throw new Error(data.message || 'RA ou senha inválidos. Tente novamente.');
             }
             
             const data = await res.json();
-            onLoginSuccess(data.usuario); // Entrega o usuário logado para o App.js
-
+            onLoginSuccess(data.usuario);
         } catch (err) {
             setError(err.message);
         }
@@ -46,4 +44,3 @@ function LoginPage({ onLoginSuccess }) {
     );
 }
 export default LoginPage;
-// A linha 'fetch' extra foi removida daqui

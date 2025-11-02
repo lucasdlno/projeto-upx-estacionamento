@@ -29,5 +29,12 @@
 
 .vaga-minha {
     background-color: #3498db; /* Azul */
-    cursor: not-allowed;
+    cursor: pointer; /* ✅ CORRIGIDO: Permite clicar para liberar */
 }
+
+/* ✅ ADICIONADO: Efeito de hover para a vaga 'minha' */
+.vaga-minha:hover {
+    transform: scale(1.05);
+}
+
+/* A chave '}' extra no final foi removida. */
