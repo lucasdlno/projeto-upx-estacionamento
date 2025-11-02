@@ -1,4 +1,4 @@
-import apiUrl from '@/lib/api';
+import apiUrl from '../lib/api'; // ✅ CORRIGIDO
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,14 +12,16 @@ function LoginPage({ onLoginSuccess }) {
         e.preventDefault();
         setError('');
         try {
-            const res = await fetch('http://localhost:3001/api/auth/login', {
+            // ✅ CORRIGIDO: usa a variável apiUrl
+            const res = await fetch(`${apiUrl}/api/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ra, senha }),
             });
 
             if (!res.ok) {
-                throw new Error('RA ou senha inválidos. Tente novamente.');
+                const data = await res.json(); // Pega a mensagem de erro do backend
+                throw new Error(data.message || 'RA ou senha inválidos. Tente novamente.');
             }
             
             const data = await res.json();
@@ -34,8 +36,8 @@ function LoginPage({ onLoginSuccess }) {
         <div className="form-container">
             <h2>Login do Aluno</h2>
             <form onSubmit={handleSubmit}>
-                <input type="text" value={ra} onChange={e => setRa(e.target.value)} placeholder="RA" required />
-                <input type="password" value={senha} onChange={e => setSenha(e.target.value)} placeholder="Senha" required />
+                <input type="text" value={ra} onChange={e => setRa(e.target.value)} placeholder="RA (Ex: 987654 ou admin)" required />
+                <input type="password" value={senha} onChange={e => setSenha(e.target.value)} placeholder="Senha (Ex: 123 ou admin)" required />
                 <button type="submit">Entrar</button>
             </form>
             {error && <p className="error-message">{error}</p>}
@@ -44,4 +46,4 @@ function LoginPage({ onLoginSuccess }) {
     );
 }
 export default LoginPage;
-fetch(`${apiUrl}/api/vagas`)
+// A linha 'fetch' extra foi removida daqui

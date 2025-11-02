@@ -1,4 +1,4 @@
-import apiUrl from '@/lib/api';
+import apiUrl from '../lib/api'; // ✅ CORRIGIDO
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,7 +18,8 @@ function CadastroPage() {
         setSuccess('');
 
         try {
-            const res = await fetch('http://localhost:3001/api/auth/registrar', {
+            // ✅ CORRIGIDO: usa a variável apiUrl
+            const res = await fetch(`${apiUrl}/api/auth/registrar`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nome, ra, senha, placa, modelo }),
@@ -40,7 +41,7 @@ function CadastroPage() {
         <div className="form-container">
             <h2>Cadastro</h2>
             {success ? (
-                <p style={{ color: 'green' }}>{success}</p>
+                <p className="success-message">{success}</p> // ✅ Classe CSS melhorada
             ) : (
                 <form onSubmit={handleSubmit}>
                     <input type="text" value={nome} onChange={e => setNome(e.target.value)} placeholder="Nome Completo" required />
@@ -57,4 +58,4 @@ function CadastroPage() {
     );
 }
 export default CadastroPage;
-fetch(`${apiUrl}/api/vagas`)
+// A linha 'fetch' extra foi removida daqui

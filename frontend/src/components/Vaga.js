@@ -1,4 +1,3 @@
-import apiUrl from '@/lib/api';
 import React from 'react';
 import './Vaga.css'; // Vamos criar um CSS específico para a vaga
 
@@ -16,12 +15,13 @@ function Vaga({ numero, estaOcupada, ocupadaPorMim, onClick }) {
         }
     }
 
-    // Na tela de admin, todas são clicáveis para ver detalhes
-    // (Precisaríamos de uma prop "isAdmin" para melhorar isso, mas por enquanto funciona)
+    // Na tela de admin, o Vaga.css vai sobrescrever o cursor
+    // (Melhoria: podemos passar uma prop 'isAdmin' no futuro)
 
     return (
         <div 
-            className={`vaga ${statusClasse}`} 
+            // Adiciona a classe 'clicavel' se a vaga puder ser clicada
+            className={`vaga ${statusClasse} ${eClicavel ? 'clicavel' : ''}`} 
             onClick={eClicavel ? onClick : null}
         >
             {numero}
@@ -29,4 +29,4 @@ function Vaga({ numero, estaOcupada, ocupadaPorMim, onClick }) {
     );
 }
 export default Vaga;
-fetch(`${apiUrl}/api/vagas`)
+// A linha 'fetch' e 'import' extras foram removidas daqui

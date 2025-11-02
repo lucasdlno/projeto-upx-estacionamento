@@ -1,4 +1,4 @@
-import apiUrl from '@/lib/api';
+import apiUrl from '../lib/api'; // ✅ CORRIGIDO
 import React, { useState, useEffect } from 'react';
 import Vaga from './Vaga';
 import { useAuth } from '../App'; // Importa o hook de autenticação
@@ -9,7 +9,8 @@ function DashboardPage() {
     const MEU_RA = usuarioLogado ? usuarioLogado.ra : null;
 
     const buscarVagas = () => {
-        fetch('http://localhost:3001/api/vagas')
+        // ✅ CORRIGIDO: usa a variável apiUrl
+        fetch(`${apiUrl}/api/vagas`)
             .then(res => res.json())
             .then(data => setVagas(data))
             .catch(error => console.error("Erro ao buscar vagas:", error));
@@ -29,10 +30,12 @@ function DashboardPage() {
         let acao = '';
 
         if (vagaClicada.ocupada && vagaClicada.ocupadaPorRA === MEU_RA) {
-            url = `http://localhost:3001/api/vagas/${vagaClicada.id}/liberar`;
+            // ✅ CORRIGIDO: usa a variável apiUrl
+            url = `${apiUrl}/api/vagas/${vagaClicada.id}/liberar`;
             acao = 'Liberando';
         } else if (!vagaClicada.ocupada) {
-            url = `http://localhost:3001/api/vagas/${vagaClicada.id}/ocupar`;
+            // ✅ CORRIGIDO: usa a variável apiUrl
+            url = `${apiUrl}/api/vagas/${vagaClicada.id}/ocupar`;
             acao = 'Ocupando';
         } else {
             return; // Vaga de outro usuário, não faz nada
@@ -73,4 +76,4 @@ function DashboardPage() {
     );
 }
 export default DashboardPage;
-fetch(`${apiUrl}/api/vagas`)
+// A linha 'fetch' extra foi removida daqui

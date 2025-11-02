@@ -1,4 +1,4 @@
-import apiUrl from '@/lib/api';
+import apiUrl from '../lib/api'; // ✅ CORRIGIDO
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../App';
 
@@ -8,7 +8,8 @@ function HistoricoPage() {
 
     useEffect(() => {
         if (usuarioLogado) {
-            fetch(`http://localhost:3001/api/vagas/historico/${usuarioLogado.ra}`)
+            // ✅ CORRIGIDO: usa a variável apiUrl
+            fetch(`${apiUrl}/api/vagas/historico/${usuarioLogado.ra}`)
                 .then(res => res.json())
                 .then(data => setHistorico(data.reverse())); // .reverse() para mostrar os mais novos primeiro
         }
@@ -31,4 +32,4 @@ function HistoricoPage() {
     );
 }
 export default HistoricoPage;
-fetch(`${apiUrl}/api/vagas`)
+// A linha 'fetch' extra foi removida daqui
