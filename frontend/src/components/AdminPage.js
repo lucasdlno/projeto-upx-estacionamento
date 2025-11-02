@@ -1,3 +1,4 @@
+import apiUrl from '@/lib/api';
 import React, { useState, useEffect } from 'react';
 import Vaga from './Vaga';
 
@@ -68,3 +69,4 @@ function AdminPage() {
     );
 }
 export default AdminPage;
+fetch(`${apiUrl}/api/vagas`)

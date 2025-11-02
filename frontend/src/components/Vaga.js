@@ -1,3 +1,4 @@
+import apiUrl from '@/lib/api';
 import React from 'react';
 import './Vaga.css'; // Vamos criar um CSS específico para a vaga
 
@@ -28,3 +29,4 @@ function Vaga({ numero, estaOcupada, ocupadaPorMim, onClick }) {
     );
 }
 export default Vaga;
+fetch(`${apiUrl}/api/vagas`)

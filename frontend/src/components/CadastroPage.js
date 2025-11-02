@@ -1,3 +1,4 @@
+import apiUrl from '@/lib/api';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -56,3 +57,4 @@ function CadastroPage() {
     );
 }
 export default CadastroPage;
+fetch(`${apiUrl}/api/vagas`)

@@ -1,3 +1,4 @@
+import apiUrl from '@/lib/api';
 import React, { useState, useEffect } from 'react';
 import Vaga from './Vaga';
 import { useAuth } from '../App'; // Importa o hook de autenticação
@@ -72,3 +73,4 @@ function DashboardPage() {
     );
 }
 export default DashboardPage;
+fetch(`${apiUrl}/api/vagas`)

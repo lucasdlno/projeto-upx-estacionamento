@@ -1,3 +1,4 @@
+import apiUrl from '@/lib/api';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -43,3 +44,4 @@ function LoginPage({ onLoginSuccess }) {
     );
 }
 export default LoginPage;
+fetch(`${apiUrl}/api/vagas`)

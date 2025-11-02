@@ -1,3 +1,4 @@
+import apiUrl from '@/lib/api';
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../App';
 
@@ -30,3 +31,4 @@ function HistoricoPage() {
     );
 }
 export default HistoricoPage;
+fetch(`${apiUrl}/api/vagas`)
