@@ -1,25 +1,28 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../App';
 
-function HistoricoPage({ usuario }) {
+function HistoricoPage() {
     const [historico, setHistorico] = useState([]);
+    const { usuarioLogado } = useAuth();
 
     useEffect(() => {
-        if (usuario) {
-            fetch(`http://localhost:3001/api/vagas/historico/${usuario.ra}`)
+        if (usuarioLogado) {
+            fetch(`http://localhost:3001/api/vagas/historico/${usuarioLogado.ra}`)
                 .then(res => res.json())
-                .then(data => setHistorico(data));
+                .then(data => setHistorico(data.reverse())); // .reverse() para mostrar os mais novos primeiro
         }
-    }, [usuario]);
+    }, [usuarioLogado]);
 
     return (
-        <div>
+        <div className="mapa-container">
             <h2>Seu Histórico de Estacionamento</h2>
-            <ul>
+            <ul className="historico-lista">
+                {historico.length === 0 && <p>Nenhum histórico encontrado.</p>}
                 {historico.map(item => (
                     <li key={item.id}>
-                        Vaga {item.numero_vaga} | 
-                        Entrada: {new Date(item.data_chegada).toLocaleString('pt-BR')} | 
-                        Saída: {new Date(item.data_saida).toLocaleString('pt-BR')}
+                        <strong>Vaga {item.numero_vaga}</strong> <br />
+                        <strong>Entrada:</strong> {new Date(item.data_chegada).toLocaleString('pt-BR')} <br />
+                        <strong>Saída:</strong> {new Date(item.data_saida).toLocaleString('pt-BR')}
                     </li>
                 ))}
             </ul>

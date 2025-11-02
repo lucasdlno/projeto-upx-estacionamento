@@ -1,17 +1,18 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend mock para o projeto UPX_EST",
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.19.2",
-    "nodemon": "^3.1.0"
-  }
+    "express": "^4.21.2",
+    "node-fetch": "^2.7.0",
+    "nodemon": "^3.1.10"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

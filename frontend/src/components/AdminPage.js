@@ -3,32 +3,37 @@ import Vaga from './Vaga';
 
 function AdminPage() {
     const [vagas, setVagas] = useState([]);
-    // Estado para mostrar detalhes da vaga clicada
     const [vagaSelecionada, setVagaSelecionada] = useState(null);
+    const [detalhesUsuario, setDetalhesUsuario] = useState(null);
 
-    // A API do admin pode ser a mesma, mas com mais detalhes
-    useEffect(() => {
-        fetch('http://localhost:3001/api/vagas') // Em um sistema real, seria uma rota protegida /api/admin/vagas
+    const buscarVagas = () => {
+        fetch('http://localhost:3001/api/vagas')
             .then(res => res.json())
             .then(data => setVagas(data));
+    };
+
+    useEffect(() => {
+        buscarVagas();
+        const interval = setInterval(buscarVagas, 5000); // Admin vê em tempo real
+        return () => clearInterval(interval);
     }, []);
 
     const handleVagaClick = (vaga) => {
         if (vaga.ocupada) {
-            // Em um sistema real, buscaríamos os dados do usuário e do carro pelo RA
-            const detalhes = {
-                ...vaga,
-                nomeUsuario: `Nome do Aluno (RA: ${vaga.ocupadaPorRA})`,
-                placaCarro: `Placa (ABC-1234)`,
-            };
-            setVagaSelecionada(detalhes);
+            setVagaSelecionada(vaga);
+            // Busca os detalhes do usuário e carro
+            fetch(`http://localhost:3001/api/auth/carro/${vaga.ocupadaPorRA}`)
+                .then(res => res.json())
+                .then(data => setDetalhesUsuario(data))
+                .catch(err => setDetalhesUsuario({nome: "Erro ao buscar dados"}));
         } else {
             setVagaSelecionada(null);
+            setDetalhesUsuario(null);
         }
     };
 
     return (
-        <div>
+        <div className="mapa-container">
             <h2>Dashboard do Administrador</h2>
             <div className="mapa-grid">
                 {vagas.map(vaga => (
@@ -36,18 +41,26 @@ function AdminPage() {
                         key={vaga.id}
                         numero={vaga.numero_vaga}
                         estaOcupada={vaga.ocupada}
-                        ocupadaPorMim={false} // Admin não "ocupa" vagas
+                        ocupadaPorMim={false} // Admin nunca "ocupa"
                         onClick={() => handleVagaClick(vaga)}
                     />
                 ))}
             </div>
+            
             {vagaSelecionada && (
                 <div className="detalhes-vaga">
                     <h3>Detalhes da Vaga {vagaSelecionada.numero_vaga}</h3>
-                    <p>Status: Ocupada</p>
-                    <p>Ocupada por: {vagaSelecionada.nomeUsuario}</p>
-                    <p>Placa do Carro: {vagaSelecionada.placaCarro}</p>
-                    <p>Horário de Chegada: {new Date(vagaSelecionada.data_chegada).toLocaleTimeString('pt-BR')}</p>
+                    <p><strong>Status:</strong> Ocupada</p>
+                    {detalhesUsuario ? (
+                        <>
+                            <p><strong>Ocupada por:</strong> {detalhesUsuario.nome}</p>
+                            <p><strong>RA:</strong> {detalhesUsuario.ra}</p>
+                            <p><strong>Veículo:</strong> {detalhesUsuario.modelo} (Placa: {detalhesUsuario.placa})</p>
+                            <p><strong>Horário de Chegada:</strong> {new Date(vagaSelecionada.data_chegada).toLocaleString('pt-BR')}</p>
+                        </>
+                    ) : (
+                        <p>Carregando detalhes do usuário...</p>
+                    )}
                     <button onClick={() => setVagaSelecionada(null)}>Fechar</button>
                 </div>
             )}
