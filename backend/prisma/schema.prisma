@@ -1,15 +1,57 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL") // Lê a variável de ambiente do Render
+}
+
+model User {
+  id     Int     @id @default(autoincrement())
+  ra     String  @unique // Chave de login
+  nome   String
+  senha  String
+  placa  String  @unique // Carro do usuário
+  modelo String
+  role   String  @default("user") // 'user' ou 'admin'
+
+  // Relações (um usuário pode estar em uma vaga e ter vários históricos)
+  vaga      Ocupacao?
+  historico Historico[]
+}
+
+model Vaga {
+  id           Int       @id @default(autoincrement())
+  numero_vaga String    @unique
+  predio       String
+  
+  // Relação (uma vaga pode ter uma ocupação)
+  ocupacao     Ocupacao?
+}
+
+// Tabela de Relação: Diz QUEM (User) está EM QUAL (Vaga)
+model Ocupacao {
+  id            Int      @id @default(autoincrement())
+  
+  vagaId        Int      @unique // Garante que a VAGA só apareça 1x
+  vaga          Vaga     @relation(fields: [vagaId], references: [id])
+  
+  userRA        String   @unique // Garante que o USUÁRIO só apareça 1x
+  user          User     @relation(fields: [userRA], references: [ra])
+
+  data_chegada  DateTime @default(now())
+}
+
+model Historico {
+  id            Int      @id @default(autoincrement())
+  numero_vaga   String
+  data_chegada  DateTime
+  data_saida    DateTime @default(now())
+  
+  userRA        String
+  user          User     @relation(fields: [userRA], references: [ra])
 }

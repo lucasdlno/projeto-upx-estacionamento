@@ -4,15 +4,20 @@
   "description": "Backend mock para o projeto UPX_EST",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "db:seed": "node prisma/seed.js"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "dependencies": {
+    "@prisma/client": "^5.22.0",
     "cors": "^2.8.5",
-    "express": "^4.21.2",
-    "node-fetch": "^2.7.0",
-    "nodemon": "^3.1.10"
+    "express": "^4.19.2",
+    "node-fetch": "^2.0.0",
+    "nodemon": "^3.1.0"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "devDependencies": {
+    "prisma": "^5.22.0"
+  }
 }

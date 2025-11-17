@@ -1,76 +1,80 @@
 const express = require('express');
 const router = express.Router();
 
-// --- BANCO DE DADOS FALSO (MOCK DB) ---
-// Vamos simular as tabelas "usuarios" e "carros"
-let usuarios = [
-    { id: 1, nome: 'Lucas D. Lino', ra: '987654', senha: '123', role: 'user' },
-    { id: 2, nome: 'Administrador', ra: 'admin', senha: 'admin', role: 'admin' }
-];
-let carros = [
-    { id: 1, placa: 'ABC-1234', modelo: 'Gol', usuario_id: 1 }
-];
-let proximoUsuarioId = 3;
-let proximoCarroId = 2;
-// --- FIM DO BANCO FALSO ---
+// A função recebe o 'prisma' que passamos no index.js
+module.exports = (prisma) => {
 
-// ROTA: Login (Feature 2)
-// POST /api/auth/login
-router.post('/login', (req, res) => {
+  // ROTA: Login
+  router.post('/login', async (req, res) => {
     const { ra, senha } = req.body;
     console.log(`Backend: Recebida tentativa de login para RA: ${ra}`);
-    
-    const usuario = usuarios.find(u => u.ra === ra && u.senha === senha);
-    
-    if (usuario) {
+
+    try {
+      const usuario = await prisma.user.findUnique({
+        where: { ra: ra },
+      });
+
+      if (usuario && usuario.senha === senha) { // Em um projeto real, compare hash!
         console.log(`Backend: Login bem-sucedido para ${usuario.nome}`);
-        // Retorna o usuário (sem a senha) como confirmação de login
         const { senha: _, ...usuarioLogado } = usuario;
         res.json({ message: "Login bem-sucedido!", usuario: usuarioLogado });
-    } else {
+      } else {
         console.log(`Backend: Falha no login, RA ou senha inválidos.`);
         res.status(401).json({ message: 'RA ou senha inválidos.' });
+      }
+    } catch (error) {
+      res.status(500).json({ message: 'Erro interno no servidor.' });
     }
-});
+  });
 
-// ROTA: Cadastro (Feature 2)
-// POST /api/auth/registrar
-router.post('/registrar', (req, res) => {
+  // ROTA: Cadastro
+  router.post('/registrar', async (req, res) => {
     const { nome, ra, senha, placa, modelo } = req.body;
-    
-    if (usuarios.some(u => u.ra === ra)) {
+
+    try {
+      const novoUsuario = await prisma.user.create({
+        data: {
+          nome,
+          ra,
+          senha, // Em um projeto real, crie um hash!
+          placa,
+          modelo,
+          role: 'user',
+        },
+      });
+      
+      console.log(`Backend: Novo usuário e carro cadastrados para o RA: ${ra}`);
+      const { senha: _, ...usuarioSemSenha } = novoUsuario;
+      res.status(201).json({ message: "Cadastro realizado com sucesso!", usuario: usuarioSemSenha });
+
+    } catch (error) {
+      if (error.code === 'P2002' && error.meta?.target.includes('ra')) {
         return res.status(400).json({ message: 'Este RA já está cadastrado.' });
-    }
-    if (carros.some(c => c.placa === placa)) {
+      }
+      if (error.code === 'P2002' && error.meta?.target.includes('placa')) {
         return res.status(400).json({ message: 'Esta placa de carro já está cadastrada.' });
+      }
+      console.error("Erro no cadastro:", error);
+      res.status(500).json({ message: 'Erro interno no servidor.' });
     }
+  });
 
-    const novoUsuario = { id: proximoUsuarioId++, nome, ra, senha, role: 'user' };
-    usuarios.push(novoUsuario);
-
-    const novoCarro = { id: proximoCarroId++, placa, modelo, usuario_id: novoUsuario.id };
-    carros.push(novoCarro);
-
-    console.log(`Backend: Novo usuário e carro cadastrados para o RA: ${ra}`);
-    const { senha: _, ...usuarioSemSenha } = novoUsuario;
-    res.status(201).json({ message: "Cadastro realizado com sucesso!", usuario: usuarioSemSenha });
-});
-
-// ROTA para pegar dados de um carro (para o admin)
-router.get('/carro/:ra', (req, res) => {
+  // ROTA: Pegar dados de um carro (para o admin)
+  router.get('/carro/:ra', async (req, res) => {
     const { ra } = req.params;
-    const usuario = usuarios.find(u => u.ra === ra);
-    if (!usuario) return res.status(404).json({ message: "Usuário não encontrado" });
+    try {
+      const usuario = await prisma.user.findUnique({
+        where: { ra: ra },
+        select: { nome: true, ra: true, placa: true, modelo: true } // Pega só o que precisa
+      });
 
-    const carro = carros.find(c => c.usuario_id === usuario.id);
-    if (!carro) return res.status(404).json({ message: "Carro não encontrado" });
+      if (!usuario) return res.status(404).json({ message: "Usuário não encontrado" });
+      
+      res.json(usuario);
+    } catch (error) {
+      res.status(500).json({ message: 'Erro interno no servidor.' });
+    }
+  });
 
-    res.json({
-        nome: usuario.nome,
-        ra: usuario.ra,
-        placa: carro.placa,
-        modelo: carro.modelo
-    });
-});
-
-module.exports = router;
+  return router;
+};
